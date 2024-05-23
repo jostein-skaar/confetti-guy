@@ -20,12 +20,20 @@ jobs:
           WITH_V: true
           DRY_RUN: false
 
-      - uses: actions/setup-node@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
 
-      - run: npm ci
-      - run: npm run build
+      - name: Build app
+        run: pnpm build
 
       - name: Replace version in files
         uses: jostein-skaar/action-erstatninger@v1
