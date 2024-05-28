@@ -1,0 +1,125 @@
+{
+	"textures": [
+		{
+			"image": "sprites@2.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 58,
+				"h": 708
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "hero-001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 56,
+						"h": 140
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 56,
+						"h": 140
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 56,
+						"h": 140
+					}
+				},
+				{
+					"filename": "hero-003.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 56,
+						"h": 140
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 56,
+						"h": 140
+					},
+					"frame": {
+						"x": 1,
+						"y": 143,
+						"w": 56,
+						"h": 140
+					}
+				},
+				{
+					"filename": "hero-005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 56,
+						"h": 140
+					},
+					"spriteSourceSize": {
+						"x": 4,
+						"y": 0,
+						"w": 52,
+						"h": 138
+					},
+					"frame": {
+						"x": 1,
+						"y": 285,
+						"w": 52,
+						"h": 138
+					}
+				},
+				{
+					"filename": "hero-004.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 56,
+						"h": 140
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 0,
+						"w": 48,
+						"h": 140
+					},
+					"frame": {
+						"x": 1,
+						"y": 425,
+						"w": 48,
+						"h": 140
+					}
+				},
+				{
+					"filename": "hero-002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 56,
+						"h": 140
+					},
+					"spriteSourceSize": {
+						"x": 6,
+						"y": 0,
+						"w": 44,
+						"h": 140
+					},
+					"frame": {
+						"x": 1,
+						"y": 567,
+						"w": 44,
+						"h": 140
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:27829e5707f2ae2d62b894ad3a07a8ff:115f452b1478d74d7329618282012fb2:4a9bf2ba9afc2827dfa178a3fc41fa73$"
+	}
+}
