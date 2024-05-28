@@ -14,7 +14,7 @@ export function createGameConfig(
 		scene: [MainScene],
 		width: width * pixelRatio,
 		height: height * pixelRatio,
-		backgroundColor: 0xcccaca,
+		backgroundColor: 0xf7f7f7,
 		autoFocus: true,
 		parent: 'game',
 

@@ -207,26 +207,6 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">../../common-game/artwork/particles/particle-heart-001.png</key>
-            <key type="filename">../../common-game/artwork/particles/particle-heart-002.png</key>
-            <key type="filename">../../common-game/artwork/particles/particle-snowflake-001.png</key>
-            <key type="filename">../../common-game/artwork/particles/particle-snowflake-002.png</key>
-            <key type="filename">../../common-game/artwork/particles/particle-snowflake-003.png</key>
-            <key type="filename">../../common-game/artwork/particles/particle-star-001.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>24,24,48,48</rect>
-                <key>scale9Paddings</key>
-                <rect>24,24,48,48</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
             <key type="filename">assets/hero/hero-001.png</key>
             <key type="filename">assets/hero/hero-002.png</key>
             <struct type="IndividualSpriteSettings">
@@ -259,10 +239,7 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">assets/obstacles/obstacles-001.png</key>
-            <key type="filename">assets/obstacles/obstacles-002.png</key>
-            <key type="filename">assets/obstacles/obstacles-003.png</key>
-            <key type="filename">assets/obstacles/obstacles-004.png</key>
+            <key type="filename">assets/hero/hero-005.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>
@@ -271,24 +248,9 @@
                 <key>scale9Enabled</key>
                 <false/>
                 <key>scale9Borders</key>
-                <rect>50,70,100,140</rect>
+                <rect>20,50,40,100</rect>
                 <key>scale9Paddings</key>
-                <rect>50,70,100,140</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
-            <key type="filename">assets/rewards/rewards-001.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0.5,0.5</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>32,32,64,64</rect>
-                <key>scale9Paddings</key>
-                <rect>32,32,64,64</rect>
+                <rect>20,50,40,100</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
@@ -300,9 +262,6 @@
                 <key>files</key>
                 <array>
                     <filename>assets/hero</filename>
-                    <filename>assets/obstacles</filename>
-                    <filename>../../common-game/artwork/particles</filename>
-                    <filename>assets/rewards</filename>
                 </array>
             </struct>
         </map>

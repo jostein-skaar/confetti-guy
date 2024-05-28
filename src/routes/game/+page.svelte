@@ -48,7 +48,7 @@
 <style>
 	@media only screen and (max-width: 600px) {
 		:global(body) {
-			background-color: #e9e9e9;
+			background-color: #f7f7f7;
 		}
 	}
 
@@ -70,9 +70,8 @@
 	@container game-container (min-width: 820px) and (min-height: 620px) {
 		#game {
 			align-items: center;
-			background-color: yellow;
 			box-sizing: content-box;
-			border: 10px dashed var(--bg-color);
+			/* border: 10px ridge var(--primary-color); */
 		}
 	}
 </style>

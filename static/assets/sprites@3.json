@@ -4,8 +4,8 @@
 			"image": "sprites@3.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 62,
-				"h": 758
+				"w": 392,
+				"h": 212
 			},
 			"scale": 0.75,
 			"frames": [
@@ -14,20 +14,20 @@
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 60,
-						"h": 150
+						"w": 84,
+						"h": 210
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 60,
-						"h": 150
+						"w": 84,
+						"h": 210
 					},
 					"frame": {
 						"x": 1,
 						"y": 1,
-						"w": 60,
-						"h": 150
+						"w": 84,
+						"h": 210
 					}
 				},
 				{
@@ -35,41 +35,20 @@
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 60,
-						"h": 150
+						"w": 84,
+						"h": 210
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 60,
-						"h": 150
+						"w": 84,
+						"h": 210
 					},
 					"frame": {
-						"x": 1,
-						"y": 153,
-						"w": 60,
-						"h": 150
-					}
-				},
-				{
-					"filename": "hero-005.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 60,
-						"h": 150
-					},
-					"spriteSourceSize": {
-						"x": 5,
-						"y": 0,
-						"w": 55,
-						"h": 148
-					},
-					"frame": {
-						"x": 1,
-						"y": 305,
-						"w": 55,
-						"h": 148
+						"x": 87,
+						"y": 1,
+						"w": 84,
+						"h": 210
 					}
 				},
 				{
@@ -77,20 +56,20 @@
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
-						"w": 60,
-						"h": 150
+						"w": 84,
+						"h": 210
 					},
 					"spriteSourceSize": {
-						"x": 3,
+						"x": 5,
 						"y": 0,
-						"w": 52,
-						"h": 150
+						"w": 71,
+						"h": 210
 					},
 					"frame": {
-						"x": 1,
-						"y": 455,
-						"w": 52,
-						"h": 150
+						"x": 173,
+						"y": 1,
+						"w": 71,
+						"h": 210
 					}
 				},
 				{
@@ -98,20 +77,41 @@
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
-						"w": 60,
-						"h": 150
+						"w": 84,
+						"h": 210
 					},
 					"spriteSourceSize": {
-						"x": 6,
+						"x": 9,
 						"y": 0,
-						"w": 48,
-						"h": 150
+						"w": 66,
+						"h": 210
 					},
 					"frame": {
-						"x": 1,
-						"y": 607,
-						"w": 48,
-						"h": 150
+						"x": 246,
+						"y": 1,
+						"w": 66,
+						"h": 210
+					}
+				},
+				{
+					"filename": "hero-005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 84,
+						"h": 210
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 0,
+						"w": 77,
+						"h": 207
+					},
+					"frame": {
+						"x": 314,
+						"y": 1,
+						"w": 77,
+						"h": 207
 					}
 				}
 			]
@@ -120,6 +120,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:d72cb8bc48216c9f6b9cc7d0ba91259d:7f0260d32bf47782dc369597c557d742:4a9bf2ba9afc2827dfa178a3fc41fa73$"
+		"smartupdate": "$TexturePacker:SmartUpdate:27829e5707f2ae2d62b894ad3a07a8ff:115f452b1478d74d7329618282012fb2:4a9bf2ba9afc2827dfa178a3fc41fa73$"
 	}
 }

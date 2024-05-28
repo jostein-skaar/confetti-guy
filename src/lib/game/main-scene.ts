@@ -6,32 +6,24 @@ export class MainScene extends Phaser.Scene {
 	height!: number;
 	cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 	hero!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-	hurtTimeline!: Phaser.Time.Timeline;
-	healthBar!: GameObjects.Rectangle;
-	healthBarText!: GameObjects.Text;
-	rewardGroup!: Phaser.Physics.Arcade.Group;
-	obstaclesGroup!: Phaser.Physics.Arcade.Group;
-	emitter!: GameObjects.Particles.ParticleEmitter;
-	currentHitObstacle?: Phaser.Types.Physics.Arcade.SpriteWithStaticBody;
+	rewardGroup!: Phaser.Physics.Arcade.StaticGroup;
+	platformGroup!: Phaser.Physics.Arcade.StaticGroup;
 	scoreText!: GameObjects.Text;
 
 	settings = {
-		healthMax: 3000,
-		healthForReward: 500,
-		healthForObstacle: -1000,
-		healthPerUpdate: 4,
-		groundHeight: adjustForPixelRatio(50),
-		heroGravity: adjustForPixelRatio(550),
-		jumpVelocity: adjustForPixelRatio(600),
-		velocity: adjustForPixelRatio(200),
-		distanceBetweenObstacles: [adjustForPixelRatio(500), adjustForPixelRatio(700)],
-		distanceBetweenRewards: [adjustForPixelRatio(300), adjustForPixelRatio(500)]
+		groundHeight: adjustForPixelRatio(24),
+		heroGravity: adjustForPixelRatio(600),
+		jumpVelocity: adjustForPixelRatio(500),
+		walkVelocity: adjustForPixelRatio(200),
+		platformColor: 0xfecc00,
+		confettiCount: 1000
 	};
 
-	health = this.settings.healthMax;
-	velocity = this.settings.velocity;
-	timeSinceStart = 0;
+	startStopTimer = false;
+	hasStopped = false;
+	timeSinceStopped = 0;
 	score = 0;
+	timeStill = 0;
 	hasLost = false;
 
 	constructor() {
@@ -54,312 +46,144 @@ export class MainScene extends Phaser.Scene {
 	}
 
 	create(): void {
-		const healthBarContainer = this.add
-			.rectangle(
-				this.scale.width / 2,
-				adjustForPixelRatio(26),
-				adjustForPixelRatio(250),
-				adjustForPixelRatio(30),
-				0xffffff
-			)
-			.setStrokeStyle(adjustForPixelRatio(2), 0x000000)
-			.setDepth(1);
-		this.healthBar = this.add
-			.rectangle(
-				healthBarContainer.x - (healthBarContainer.width - healthBarContainer.lineWidth) / 2,
-				healthBarContainer.y,
-				healthBarContainer.width - healthBarContainer.lineWidth,
-				healthBarContainer.height - healthBarContainer.lineWidth,
-				0xff00ff
-			)
-			.setDepth(1)
-			.setOrigin(0, 0.5);
-		this.healthBarText = this.add
-			.text(healthBarContainer.x, adjustForPixelRatio(16), 'exuberance', {
-				fontSize: `${adjustForPixelRatio(24)}px`,
-				color: '#000'
-			})
-			.setDepth(1)
-			.setOrigin(0.5, 0);
-
 		this.scoreText = this.add
-			.text(
-				this.scale.width / 2 - (healthBarContainer.width - healthBarContainer.lineWidth) / 2,
-				adjustForPixelRatio(50),
-				'score: 0',
-				{
-					fontSize: adjustForPixelRatio(24) + 'px',
-					color: '#fff'
-				}
-			)
+			.text(adjustForPixelRatio(10), adjustForPixelRatio(10), '', {
+				fontSize: adjustForPixelRatio(20) + 'px',
+				color: '#222'
+			})
 			.setDepth(1);
 
 		this.cursors = this.input.keyboard!.createCursorKeys();
-		this.cursors.space.onDown = () => {
+
+		this.cursors.up.onDown = () => {
 			this.performJump();
 		};
 		this.input.on('pointerdown', () => {
-			this.performJump();
+			if (this.input.activePointer.y < this.width / 2) {
+				this.performJump();
+			}
 		});
 
-		const ground = this.add.rectangle(
-			this.scale.width / 2,
-			this.scale.height - this.settings.groundHeight / 2,
-			this.scale.width,
-			this.settings.groundHeight,
-			0x828282
-		);
-		this.physics.add.existing(ground, true);
+		this.rewardGroup = this.physics.add.staticGroup();
+		this.platformGroup = this.physics.add.staticGroup();
 
-		this.rewardGroup = this.physics.add.group();
-		let previousRewardX = 0;
-		for (let i = 0; i < 5; i++) {
-			const reward = this.rewardGroup.create(0, 0, 'sprites', 'rewards-001.png');
-			previousRewardX = this.positionReward(reward, previousRewardX);
-		}
-
-		this.obstaclesGroup = this.physics.add.group();
-
-		let previousX = 0;
-		for (let i = 0; i < 2; i++) {
-			const obstacle = this.obstaclesGroup.create(
-				0,
-				0,
-				'sprites',
-				obstacles[Phaser.Math.Between(0, obstacles.length - 1)]
-			);
-			obstacle.setImmovable(true);
-			previousX = this.positionObstacle(obstacle, previousX);
-		}
+		this.addPlatforms();
+		this.addConfetti();
 
 		this.hero = this.physics.add.sprite(0, 0, 'sprites', 'hero-001.png');
 		this.resetHeroPosition();
 		this.hero.setGravityY(this.settings.heroGravity);
 		this.hero.setCollideWorldBounds(true);
+		console.log('hero', this.hero.height, this.hero.width);
+
 		this.hero.anims.create({
-			key: 'run',
-			frames: [
-				{ key: 'sprites', frame: 'hero-001.png' },
-				{ key: 'sprites', frame: 'hero-002.png' }
-			],
-			frameRate: 10,
+			key: 'stand',
+			frames: [{ key: 'sprites', frame: 'hero-001.png' }],
+			frameRate: 6,
 			repeat: -1
 		});
-		this.hero.anims.play('run', true);
 		this.hero.anims.create({
 			key: 'jump',
+			frames: [
+				{ key: 'sprites', frame: 'hero-005.png' },
+				{ key: 'sprites', frame: 'hero-004.png' }
+			],
+			frameRate: 6,
+			repeat: -1
+		});
+		this.hero.anims.create({
+			key: 'walk',
 			frames: [
 				{ key: 'sprites', frame: 'hero-003.png' },
 				{ key: 'sprites', frame: 'hero-004.png' }
 			],
-			frameRate: 2,
+			frameRate: 6,
 			repeat: -1
 		});
 
-		this.hurtTimeline = this.add.timeline({
-			at: 0,
-			tween: {
-				targets: this.hero,
-				scale: 0.8,
-				ease: 'Power0',
-				duration: 40,
-				yoyo: true,
-				repeat: 10,
-				onActive: () => {
-					this.hero.setTint(0xff0000);
-					// this.velocity = 0;
-				},
-				onComplete: () => {
-					this.hero.setTint(undefined);
-					this.currentHitObstacle = undefined;
-					// this.velocity = this.settings.velocity;
-				}
-			}
-		});
-
-		this.physics.add.collider(this.hero, ground);
+		this.physics.add.collider(this.hero, this.platformGroup);
 
 		this.physics.add.overlap(
 			this.hero,
 			this.rewardGroup,
 			// @ts-expect-error(TODO: Need to find out how to fix this)
-			(_hero, reward: Phaser.Types.Physics.Arcade.SpriteWithStaticBody) => {
+			(_hero, reward: Phaser.Types.Physics.Arcade.ImageWithStaticBody) => {
 				this.collectReward(reward);
-				this.positionReward(reward, this.findFurthestReward());
 			}
 		);
-
-		this.physics.add.overlap(
-			this.hero,
-			this.obstaclesGroup,
-			// @ts-expect-error(TODO: Need to find out how to fix this)
-			(_hero, obstacle: Phaser.Types.Physics.Arcade.SpriteWithStaticBody) => {
-				if (this.currentHitObstacle === obstacle) {
-					return;
-				}
-				this.currentHitObstacle = obstacle;
-				this.punish();
-			}
-		);
-
-		this.emitter = this.add.particles(0, 0, 'sprites', {
-			frame: 'particle-heart-001.png',
-			scale: { start: 1.5, end: 0.5 },
-			speed: { min: 10, max: 100 },
-			lifespan: 800,
-			quantity: 11,
-			active: false
-		});
 	}
 
 	update(_time: number, delta: number): void {
-		this.timeSinceStart += delta;
-		this.repositionObstacles();
-		this.repositionRewards();
+		if (this.input.activePointer.isDown) {
+			const { x } = this.input.activePointer;
+			if (Math.abs(x - this.hero.x) < 10) {
+				this.hero.setVelocityX(0);
+				this.hero.anims.play('stand', true);
+				this.hero.setFlipX(false);
+				this.hasStopped = true;
+			} else if (x < this.hero.x) {
+				this.hero.setVelocityX(-this.settings.walkVelocity);
+				this.hero.anims.play('walk', true);
+				this.hero.setFlipX(true);
+				this.hasStopped = false;
+			} else if (x > this.hero.x) {
+				this.hero.setVelocityX(this.settings.walkVelocity);
+				this.hero.anims.play('walk', true);
+				this.hero.setFlipX(false);
+				this.hasStopped = false;
+			}
+		} else {
+			if (this.cursors.left.isDown) {
+				this.hero.setVelocityX(-this.settings.walkVelocity);
+				this.hero.anims.play('walk', true);
+				this.hero.setFlipX(true);
+				this.hasStopped = false;
+			} else if (this.cursors.right.isDown) {
+				this.hero.setVelocityX(this.settings.walkVelocity);
+				this.hero.anims.play('walk', true);
+				this.hero.setFlipX(false);
+				this.hasStopped = false;
+			} else {
+				this.hero.setVelocityX(0);
+				this.hero.anims.play('stand', true);
+				this.hero.setFlipX(false);
+				this.timeSinceStopped += delta;
+				this.hasStopped = true;
+			}
+		}
 
-		this.health -= this.settings.healthPerUpdate;
-		this.drawHealthBar();
+		if (this.hasStopped === false) {
+			this.startStopTimer = true;
+		}
 
-		if (this.health <= 0) {
-			this.lose();
+		if (this.startStopTimer && this.hasStopped) {
+			this.timeSinceStopped += delta;
+		} else {
+			this.timeSinceStopped = 0;
+		}
+
+		if (this.timeSinceStopped > 5000) {
+			this.addPlatforms();
+			this.addConfetti();
+			this.timeSinceStopped = 0;
+			this.startStopTimer = false;
 		}
 
 		if (this.isHeroBelowGround()) {
 			this.resetHeroPosition();
 		}
-		if (this.hero.body.onFloor()) {
-			this.hero.anims.play('run', true);
-		} else {
+		if (!this.hero.body.onFloor()) {
 			this.hero.anims.play('jump', true);
 		}
 
-		this.score = this.timeSinceStart / 1000;
-		this.scoreText.setText(`score: ${this.score.toFixed(2)}`);
-	}
+		this.timeStill = 5 - this.timeSinceStopped / 1000;
+		const confettiLeft = this.rewardGroup.getChildren().length;
 
-	private drawHealthBar() {
-		const percent = Math.max(Math.min(this.health / this.settings.healthMax, 1), 0);
-		this.healthBar.setScale(percent, 1);
-
-		if (percent < 0.2) {
-			this.healthBar.setFillStyle(0xf21405);
-		} else if (percent < 0.5) {
-			this.healthBar.setFillStyle(0xf2de05);
-		} else {
-			this.healthBar.setFillStyle(0x00fa00);
+		let text = `confetti to clean: ${confettiLeft}`;
+		if (this.startStopTimer) {
+			text += `\n(restarts in: ${this.timeStill.toFixed(2)})`;
 		}
-	}
-
-	private positionReward(
-		reward: Phaser.Types.Physics.Arcade.SpriteWithStaticBody,
-		previousX: number
-	): number {
-		const extraDistance = this.timeSinceStart / 100;
-
-		const x =
-			previousX +
-			Phaser.Math.Between(
-				this.settings.distanceBetweenRewards[0] + extraDistance,
-				this.settings.distanceBetweenRewards[1] + extraDistance
-			);
-		const y = Phaser.Math.Between(
-			adjustForPixelRatio(100),
-			this.scale.height - reward.height / 2 - this.settings.groundHeight - adjustForPixelRatio(100)
-		);
-		reward.setPosition(x, y);
-		reward.setVelocityX(-this.velocity);
-
-		return x;
-	}
-
-	private positionObstacle(
-		obstacle: Phaser.Types.Physics.Arcade.SpriteWithStaticBody,
-		previousX: number
-	): number {
-		const x =
-			previousX +
-			Phaser.Math.Between(
-				this.settings.distanceBetweenObstacles[0],
-				this.settings.distanceBetweenObstacles[1]
-			);
-		const y = this.scale.height - obstacle.height / 2 - this.settings.groundHeight;
-		obstacle.setPosition(x, y);
-		obstacle.setVelocityX(-this.velocity);
-
-		return x;
-	}
-
-	private repositionObstacles() {
-		this.obstaclesGroup.children.iterate(
-			// @ts-expect-error(TODO: Need to find out how to fix this)
-			(obstacle: Phaser.Types.Physics.Arcade.SpriteWithStaticBody) => {
-				if (obstacle.x < 0 - obstacle.width / 2) {
-					this.positionObstacle(obstacle, this.findFurthestObstacle());
-					let newFrame = obstacles[Phaser.Math.Between(0, obstacles.length - 1)];
-					while (newFrame === obstacle.frame.name) {
-						newFrame = obstacles[Phaser.Math.Between(0, obstacles.length - 1)];
-					}
-					obstacle.setFrame(newFrame);
-				}
-			}
-		);
-	}
-
-	private repositionRewards() {
-		this.rewardGroup.children.iterate(
-			// @ts-expect-error(TODO: Need to find out how to fix this)
-			(reward: Phaser.Types.Physics.Arcade.SpriteWithStaticBody) => {
-				if (reward.x < 0 - reward.width / 2) {
-					this.positionReward(reward, this.findFurthestReward());
-				}
-			}
-		);
-	}
-
-	private findFurthestReward(): number {
-		let furthestX = 0;
-		this.rewardGroup.children.iterate(
-			// @ts-expect-error(TODO: Need to find out how to fix this)
-			(reward: Phaser.Types.Physics.Arcade.SpriteWithStaticBody) => {
-				if (reward.x > furthestX) {
-					furthestX = reward.x;
-				}
-			}
-		);
-		return furthestX;
-	}
-
-	private findFurthestObstacle(): number {
-		let furthestX = 0;
-		this.obstaclesGroup.children.iterate(
-			// @ts-expect-error(TODO: Need to find out how to fix this)
-			(obstacle: Phaser.Types.Physics.Arcade.SpriteWithStaticBody) => {
-				if (obstacle.x > furthestX) {
-					furthestX = obstacle.x;
-				}
-			}
-		);
-		return furthestX;
-	}
-
-	private collectReward(reward: Phaser.Types.Physics.Arcade.SpriteWithStaticBody) {
-		const bounds = reward.getBounds();
-		this.emitter.setPosition(bounds.left, bounds.top);
-		this.emitter.active = true;
-		this.emitter.explode();
-		this.health += this.settings.healthForReward;
-		if (this.health > this.settings.healthMax) {
-			this.health = this.settings.healthMax;
-		}
-	}
-
-	private punish() {
-		this.health += this.settings.healthForObstacle;
-		this.hurtTimeline.play();
-		if (this.health < 0) {
-			this.health = 0;
-			this.lose();
-		}
+		this.scoreText.setText(text);
 	}
 
 	private performJump() {
@@ -377,6 +201,137 @@ export class MainScene extends Phaser.Scene {
 
 	private isHeroBelowGround() {
 		return this.hero.y > this.scale.height - this.hero.height / 2 - this.settings.groundHeight;
+	}
+
+	private addPlatforms() {
+		this.platformGroup.clear(true, true);
+		const ground = this.add.rectangle(
+			this.scale.width / 2,
+			this.scale.height - this.settings.groundHeight / 2,
+			this.scale.width,
+			this.settings.groundHeight,
+			this.settings.platformColor
+		);
+		this.platformGroup.add(ground);
+
+		const platformYPositions = [
+			adjustForPixelRatio(126),
+			adjustForPixelRatio(284),
+			adjustForPixelRatio(442)
+		];
+		const possibleXCount = Math.floor(this.scale.width / 100) / adjustForPixelRatio(1) - 1;
+		const adjustedWidth = this.scale.width / possibleXCount;
+
+		for (const y of platformYPositions) {
+			const numberOfPlatforms = Phaser.Math.Between(3, possibleXCount - 2);
+			const platformIndices: number[] = [];
+			for (let i = 0; i < numberOfPlatforms; i++) {
+				let randomIndex = Phaser.Math.Between(0, possibleXCount - 1);
+				while (platformIndices.includes(randomIndex)) {
+					randomIndex = Phaser.Math.Between(0, possibleXCount - 1);
+				}
+				platformIndices.push(randomIndex);
+			}
+
+			for (const index of platformIndices) {
+				const x = index * adjustedWidth;
+				const platform = this.add.rectangle(
+					x + adjustedWidth / 2,
+					y,
+					adjustedWidth,
+					this.settings.groundHeight,
+					this.settings.platformColor
+				);
+				this.platformGroup.add(platform);
+			}
+		}
+	}
+
+	private addConfetti() {
+		// const color = Phaser.Display.Color.RandomRGB().color;
+		const confettiColors = [
+			0xff0000, // Red
+			0x00ff00, // Green
+			0x0000ff, // Blue
+			0xffff00, // Yellow
+			0xff00ff, // Magenta
+			0x00ffff, // Cyan
+			0xffa500, // Orange
+			0x800080, // Purple
+			0xffc0cb, // Pink
+			0x00ff7f, // Spring Green
+			0xffd700, // Gold
+			0x8a2be2, // Blue Violet
+			0xa52a2a, // Brown
+			0xdeb887, // Burly Wood
+			0x5f9ea0, // Cadet Blue
+			0x7fff00, // Chartreuse
+			0xd2691e, // Chocolate
+			0xff7f50, // Coral
+			0x6495ed, // Cornflower Blue
+			0xdc143c, // Crimson
+			0x00ced1, // Dark Turquoise
+			0x9400d3, // Dark Violet
+			0xff1493, // Deep Pink
+			0x1e90ff, // Dodger Blue
+			0xb22222, // Firebrick
+			0x228b22, // Forest Green
+			0xdaa520, // Goldenrod
+			0xadff2f, // Green Yellow
+			0xff69b4, // Hot Pink
+			0xcd5c5c // Indian Red
+		];
+
+		const platformBoundsList = [];
+		for (const platform of this.platformGroup.getChildren()) {
+			const platformBounds = (platform as GameObjects.Rectangle).getBounds();
+			platformBoundsList.push(platformBounds);
+		}
+
+		this.rewardGroup.clear(true, true);
+		let x = 0;
+		let y = 0;
+		for (let i = 0; i < this.settings.confettiCount; i++) {
+			x = 0;
+			y = 0;
+			while (x < adjustForPixelRatio(300) && y < adjustForPixelRatio(60)) {
+				x = Phaser.Math.Between(0, this.scale.width);
+				y = Phaser.Math.Between(0, this.scale.height - this.settings.groundHeight);
+				for (const platformBounds of platformBoundsList) {
+					if (
+						Phaser.Geom.Rectangle.Overlaps(
+							new Phaser.Geom.Rectangle(
+								x - adjustForPixelRatio(5),
+								y - adjustForPixelRatio(5),
+								adjustForPixelRatio(10),
+								adjustForPixelRatio(10)
+							),
+							platformBounds
+						)
+					) {
+						x = 0;
+						y = 0;
+						break;
+					}
+				}
+			}
+
+			const color = Phaser.Math.RND.pick(confettiColors);
+			const confetti = this.add.rectangle(
+				x,
+				y,
+				adjustForPixelRatio(Phaser.Math.Between(7, 11)),
+				adjustForPixelRatio(Phaser.Math.Between(5, 7)),
+				color
+			);
+
+			confetti.rotation = Phaser.Math.Between(0, 360);
+			this.rewardGroup.add(confetti);
+		}
+	}
+
+	private collectReward(reward: Phaser.Types.Physics.Arcade.ImageWithStaticBody) {
+		reward.destroy();
 	}
 
 	private lose() {
