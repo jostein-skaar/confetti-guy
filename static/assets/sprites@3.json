@@ -1,0 +1,125 @@
+{
+	"textures": [
+		{
+			"image": "sprites@3.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 62,
+				"h": 758
+			},
+			"scale": 0.75,
+			"frames": [
+				{
+					"filename": "hero-001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 60,
+						"h": 150
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 60,
+						"h": 150
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 60,
+						"h": 150
+					}
+				},
+				{
+					"filename": "hero-003.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 60,
+						"h": 150
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 60,
+						"h": 150
+					},
+					"frame": {
+						"x": 1,
+						"y": 153,
+						"w": 60,
+						"h": 150
+					}
+				},
+				{
+					"filename": "hero-005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 60,
+						"h": 150
+					},
+					"spriteSourceSize": {
+						"x": 5,
+						"y": 0,
+						"w": 55,
+						"h": 148
+					},
+					"frame": {
+						"x": 1,
+						"y": 305,
+						"w": 55,
+						"h": 148
+					}
+				},
+				{
+					"filename": "hero-004.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 60,
+						"h": 150
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 0,
+						"w": 52,
+						"h": 150
+					},
+					"frame": {
+						"x": 1,
+						"y": 455,
+						"w": 52,
+						"h": 150
+					}
+				},
+				{
+					"filename": "hero-002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 60,
+						"h": 150
+					},
+					"spriteSourceSize": {
+						"x": 6,
+						"y": 0,
+						"w": 48,
+						"h": 150
+					},
+					"frame": {
+						"x": 1,
+						"y": 607,
+						"w": 48,
+						"h": 150
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:d72cb8bc48216c9f6b9cc7d0ba91259d:7f0260d32bf47782dc369597c557d742:4a9bf2ba9afc2827dfa178a3fc41fa73$"
+	}
+}

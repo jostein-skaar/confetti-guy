@@ -1,0 +1,57 @@
+:root {
+	--primary-color: #006aa7;
+	--secondary-color: #fecc00;
+	--bg-color: #424242;
+	--text-color: #222222;
+}
+
+body {
+	margin: 0;
+	background-color: var(--bg-color);
+	color: var(--secondary-color);
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 400;
+	font-style: normal;
+}
+
+canvas {
+	margin: 0 auto;
+}
+
+header {
+	display: flex;
+	gap: 1rem;
+	align-items: center;
+	flex-direction: column;
+	max-width: 500px;
+	margin: 0 auto;
+	text-align: center;
+	text-wrap: balance;
+	padding: 1rem;
+}
+
+h1 {
+	font-size: 2rem;
+}
+p {
+	font-size: 1rem;
+}
+
+img {
+	height: clamp(100px, 35vh, 350px);
+}
+
+a {
+	display: block;
+	font-size: 1.4rem;
+	margin-top: 1rem;
+	padding: 0.5rem;
+	text-decoration: none;
+	border-radius: 5px;
+	background-color: var(--primary-color);
+	transition: filter 0.3s ease;
+	width: 100%;
+}
+a:hover {
+	filter: brightness(1.2);
+}
