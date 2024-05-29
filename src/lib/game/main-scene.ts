@@ -6,17 +6,20 @@ export class MainScene extends Phaser.Scene {
 	height!: number;
 	cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
 	hero!: Phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-	rewardGroup!: Phaser.Physics.Arcade.StaticGroup;
+	rewardGroup!: Phaser.Physics.Arcade.Group;
 	platformGroup!: Phaser.Physics.Arcade.StaticGroup;
 	scoreText!: GameObjects.Text;
+	levelClearedText!: GameObjects.Text;
 
 	settings = {
 		groundHeight: adjustForPixelRatio(24),
 		heroGravity: adjustForPixelRatio(600),
-		jumpVelocity: adjustForPixelRatio(500),
+		jumpVelocity: adjustForPixelRatio(600),
 		walkVelocity: adjustForPixelRatio(200),
 		platformColor: 0xfecc00,
-		confettiCount: 1000
+		confettiBurstCount: 100,
+		confettiCount: 10,
+		restartTime: 50000
 	};
 
 	control = {
@@ -32,6 +35,27 @@ export class MainScene extends Phaser.Scene {
 	timeStill = 0;
 	hasLost = false;
 	cursorButtonAlpha = 0.6;
+	confettiIsFinishedShooting = false;
+	speedTimer = 0;
+	speedReductionCounter = 0;
+	confettiSpeedIsFinished = false;
+
+	ranks = [
+		'Confetti Trainee',
+		'Confetti Sweeper',
+		'Party Cleaner',
+		'Confetti Collector',
+		'Celebration Custodian',
+		'Festivity Janitor',
+		'Event Sweeper',
+		'Party Polisher',
+		'Confetti Commander',
+		'Celebration Specialist',
+		'Confetti Conqueror',
+		'Confetti Guy'
+	];
+	level = 0;
+	rank = this.ranks[0];
 
 	constructor() {
 		super('main-scene');
@@ -54,16 +78,16 @@ export class MainScene extends Phaser.Scene {
 
 	create(): void {
 		this.scoreText = this.add
-			.text(adjustForPixelRatio(10), adjustForPixelRatio(10), '', {
+			.text(adjustForPixelRatio(10), this.height - adjustForPixelRatio(42), '', {
 				fontSize: adjustForPixelRatio(20) + 'px',
-				color: '#222'
+				color: '#006aa7'
 			})
 			.setDepth(1);
 
 		this.cursors = this.input.keyboard!.createCursorKeys();
 
-		const upPositionX = this.width - adjustForPixelRatio(110);
-		const upPositionY = this.height - adjustForPixelRatio(120);
+		const upPositionX = this.width - adjustForPixelRatio(100);
+		const upPositionY = this.height - adjustForPixelRatio(135);
 		const leftRightPositionY = upPositionY + adjustForPixelRatio(54);
 		const leftPositionX = upPositionX - adjustForPixelRatio(27);
 		const rightPositionX = upPositionX + adjustForPixelRatio(27);
@@ -151,7 +175,9 @@ export class MainScene extends Phaser.Scene {
 			this.control.right = false;
 		};
 
-		this.rewardGroup = this.physics.add.staticGroup();
+		this.rewardGroup = this.physics.add.group({
+			allowGravity: false
+		});
 		this.platformGroup = this.physics.add.staticGroup();
 
 		this.addPlatforms();
@@ -189,6 +215,7 @@ export class MainScene extends Phaser.Scene {
 		});
 
 		this.physics.add.collider(this.hero, this.platformGroup);
+		this.physics.add.collider(this.rewardGroup, this.platformGroup);
 
 		this.physics.add.overlap(
 			this.hero,
@@ -198,6 +225,27 @@ export class MainScene extends Phaser.Scene {
 				this.collectReward(reward);
 			}
 		);
+
+		this.levelClearedText = this.add
+			.text(this.width / 2, this.height / 2, 'The rank\non two lines', {
+				fontSize: `${adjustForPixelRatio(40)}px`,
+				color: '#006aa7',
+				fontStyle: 'bold',
+				align: 'center'
+			})
+			.setOrigin(0.5, 0.5)
+			.setDepth(1)
+			.setVisible(false);
+
+		this.tweens.add({
+			targets: this.levelClearedText,
+			// x: this.bredde,
+			scale: 0.7,
+			ease: 'Power0',
+			duration: 250,
+			yoyo: true,
+			repeat: -1
+		});
 	}
 
 	update(_time: number, delta: number): void {
@@ -219,44 +267,6 @@ export class MainScene extends Phaser.Scene {
 			this.hasStopped = true;
 		}
 
-		// if (this.input.activePointer.isDown) {
-		// const { x } = this.input.activePointer;
-		// if (Math.abs(x - this.hero.x) < 10) {
-		// 	this.hero.setVelocityX(0);
-		// 	this.hero.anims.play('stand', true);
-		// 	this.hero.setFlipX(false);
-		// 	this.hasStopped = true;
-		// } else if (x < this.hero.x) {
-		// 	this.hero.setVelocityX(-this.settings.walkVelocity);
-		// 	this.hero.anims.play('walk', true);
-		// 	this.hero.setFlipX(true);
-		// 	this.hasStopped = false;
-		// } else if (x > this.hero.x) {
-		// 	this.hero.setVelocityX(this.settings.walkVelocity);
-		// 	this.hero.anims.play('walk', true);
-		// 	this.hero.setFlipX(false);
-		// 	this.hasStopped = false;
-		// }
-		// } else {
-		// 	if (this.cursors.left.isDown) {
-		// 		this.hero.setVelocityX(-this.settings.walkVelocity);
-		// 		this.hero.anims.play('walk', true);
-		// 		this.hero.setFlipX(true);
-		// 		this.hasStopped = false;
-		// 	} else if (this.cursors.right.isDown) {
-		// 		this.hero.setVelocityX(this.settings.walkVelocity);
-		// 		this.hero.anims.play('walk', true);
-		// 		this.hero.setFlipX(false);
-		// 		this.hasStopped = false;
-		// 	} else {
-		// 		this.hero.setVelocityX(0);
-		// 		this.hero.anims.play('stand', true);
-		// 		this.hero.setFlipX(false);
-		// 		this.timeSinceStopped += delta;
-		// 		this.hasStopped = true;
-		// 	}
-		// }
-
 		if (this.hasStopped === false) {
 			this.startStopTimer = true;
 		}
@@ -267,7 +277,7 @@ export class MainScene extends Phaser.Scene {
 			this.timeSinceStopped = 0;
 		}
 
-		if (this.timeSinceStopped > 5000) {
+		if (this.timeSinceStopped > this.settings.restartTime) {
 			this.addPlatforms();
 			this.addConfetti();
 			this.timeSinceStopped = 0;
@@ -281,14 +291,33 @@ export class MainScene extends Phaser.Scene {
 			this.hero.anims.play('jump', true);
 		}
 
-		this.timeStill = 5 - this.timeSinceStopped / 1000;
-		const confettiLeft = this.rewardGroup.getChildren().length;
-
-		let text = `confetti to clean: ${confettiLeft}`;
-		if (this.startStopTimer) {
-			text += `\n(restarts in: ${this.timeStill.toFixed(2)})`;
+		if (this.confettiIsFinishedShooting && !this.confettiSpeedIsFinished) {
+			this.speedTimer += delta;
+			if (this.speedTimer > 200) {
+				this.rewardGroup.getChildren().forEach((confetti) => {
+					const confettiBody = confetti.body as Phaser.Physics.Arcade.Body;
+					confettiBody.setVelocityX(confettiBody.velocity.x * 0.9);
+					confettiBody.setVelocityY(confettiBody.velocity.y * 0.9);
+				});
+				this.speedTimer = 0;
+				this.speedReductionCounter++;
+				if (this.speedReductionCounter > 20) {
+					this.confettiSpeedIsFinished = true;
+				}
+			}
 		}
+
+		const confettiLeft = this.rewardGroup.getChildren().length;
+		const text = `${this.rank}\nConfetti Counter: ${confettiLeft}`;
+		// if (this.startStopTimer) {
+		//  this.timeStill = (this.settings.restartTime - this.timeSinceStopped) / 1000;
+		// 	text += `\n(restarts in: ${this.timeStill.toFixed(2)})`;
+		// }
 		this.scoreText.setText(text);
+
+		if (this.confettiIsFinishedShooting && confettiLeft === 0) {
+			this.finished();
+		}
 	}
 
 	private performJump() {
@@ -300,7 +329,7 @@ export class MainScene extends Phaser.Scene {
 	private resetHeroPosition() {
 		this.hero.setPosition(
 			this.scale.width / 4,
-			this.scale.height - this.hero.height / 2 - this.settings.groundHeight
+			this.scale.height - this.hero.height / 2 - this.settings.groundHeight * 2
 		);
 	}
 
@@ -312,17 +341,17 @@ export class MainScene extends Phaser.Scene {
 		this.platformGroup.clear(true, true);
 		const ground = this.add.rectangle(
 			this.scale.width / 2,
-			this.scale.height - this.settings.groundHeight / 2,
+			this.scale.height - this.settings.groundHeight,
 			this.scale.width,
-			this.settings.groundHeight,
+			this.settings.groundHeight * 2,
 			this.settings.platformColor
 		);
 		this.platformGroup.add(ground);
 
 		const platformYPositions = [
-			adjustForPixelRatio(126),
-			adjustForPixelRatio(284),
-			adjustForPixelRatio(442)
+			adjustForPixelRatio(132),
+			adjustForPixelRatio(280),
+			adjustForPixelRatio(428)
 		];
 		const possibleXCount = Math.floor(this.scale.width / 100) / adjustForPixelRatio(1) - 1;
 		const adjustedWidth = this.scale.width / possibleXCount;
@@ -352,7 +381,49 @@ export class MainScene extends Phaser.Scene {
 		}
 	}
 
-	private addConfetti() {
+	private async addConfetti() {
+		const confettiColors = [
+			0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0xff00ff, 0x00ffff, 0xffa500, 0x800080, 0xffc0cb,
+			0x00ff7f, 0xffd700, 0x8a2be2, 0xa52a2a, 0xdeb887, 0x5f9ea0, 0x7fff00, 0xd2691e, 0xff7f50,
+			0x6495ed, 0xdc143c, 0x00ced1, 0x9400d3, 0xff1493, 0x1e90ff, 0xb22222, 0x228b22, 0xdaa520,
+			0xadff2f, 0xff69b4, 0xcd5c5c
+		];
+
+		const speeds = [-10, -9, -8, -7, -6, -5, 5, 6, 7, 8, 9, 10].map(adjustForPixelRatio);
+
+		this.rewardGroup.clear(true, true);
+
+		for (let j = 0; j < this.settings.confettiBurstCount; j++) {
+			const x = Phaser.Math.Between(0, this.scale.width);
+			const y = Phaser.Math.Between(0, this.scale.height - this.settings.groundHeight);
+
+			for (let i = 0; i < this.settings.confettiCount; i++) {
+				const color = Phaser.Math.RND.pick(confettiColors);
+
+				this.rewardGroup
+					.create(x, y, 'sprites', 'rewards-001.png')
+					.setTintFill(color)
+					.setDisplaySize(
+						adjustForPixelRatio(Phaser.Math.Between(7, 11)),
+						adjustForPixelRatio(Phaser.Math.Between(5, 7))
+					)
+					.setRotation(Phaser.Math.Between(0, 360))
+					.setCollideWorldBounds(true)
+					.setBounce(1, 1)
+					.setVelocityX(Phaser.Math.RND.pick(speeds) * 20)
+					.setVelocityY(Phaser.Math.RND.pick(speeds) * 20);
+			}
+
+			await this.sleep(100 / (j + 1));
+		}
+		this.confettiIsFinishedShooting = true;
+	}
+
+	private sleep(ms: number): Promise<void> {
+		return new Promise((resolve) => setTimeout(resolve, ms));
+	}
+
+	private addConfettiStaticRectangle() {
 		// const color = Phaser.Display.Color.RandomRGB().color;
 		const confettiColors = [
 			0xff0000, // Red
@@ -430,13 +501,40 @@ export class MainScene extends Phaser.Scene {
 				color
 			);
 
+			this.physics.add.existing(confetti);
+
 			confetti.rotation = Phaser.Math.Between(0, 360);
-			this.rewardGroup.add(confetti);
+			// confetti.setVelocity(Phaser.Math.Between(-50, 50), Phaser.Math.Between(-50, 50));
+			// this.rewardGroup.add(confetti);
 		}
 	}
 
 	private collectReward(reward: Phaser.Types.Physics.Arcade.ImageWithStaticBody) {
 		reward.destroy();
+	}
+
+	private finished() {
+		this.level++;
+		this.rank = this.ranks[this.level > 11 ? 11 : this.level];
+		if (this.level > 10) {
+			this.rank += ' ' + this.getDanRank(this.level - 10);
+		}
+		this.levelClearedText.setText(
+			`Level ${this.level} cleared!\n${this.replaceFirstTwoOccurrences(this.rank, ' ', '\n')}`
+		);
+		this.levelClearedText.setVisible(true);
+		this.confettiIsFinishedShooting = false;
+		this.timeSinceStopped = 0;
+		this.startStopTimer = false;
+		this.confettiSpeedIsFinished = false;
+		this.speedReductionCounter = 0;
+		setTimeout(() => {
+			this.addPlatforms();
+			this.addConfetti();
+			setTimeout(() => {
+				this.levelClearedText.setVisible(false);
+			}, 1000);
+		}, 2500);
 	}
 
 	private lose() {
@@ -447,8 +545,24 @@ export class MainScene extends Phaser.Scene {
 		this.scene.pause();
 		this.cameras.main.setBackgroundColor(0xbababa);
 		this.cameras.main.setAlpha(0.5);
-		setTimeout(() => {
-			window.location.href = '/lose?score=' + this.score.toFixed(2);
-		}, 1200);
+		// setTimeout(() => {
+		// 	window.location.href = '/lose?score=' + this.score.toFixed(2);
+		// }, 1200);
+	}
+	private getDanRank(danLevel: number): string {
+		const suffixes = ['th', 'st', 'nd', 'rd'];
+		const lastDigit = danLevel % 10;
+		const lastTwoDigits = danLevel % 100;
+
+		const suffix = lastTwoDigits >= 11 && lastTwoDigits <= 13 ? 'th' : suffixes[lastDigit] || 'th';
+		return `${danLevel}${suffix} Dan`;
+	}
+
+	private replaceFirstTwoOccurrences(str: string, find: string, replace: string) {
+		let count = 0;
+		return str.replace(new RegExp(find, 'g'), (match) => {
+			count++;
+			return count <= 2 ? replace : match;
+		});
 	}
 }

@@ -5,7 +5,7 @@
 			"format": "RGBA8888",
 			"size": {
 				"w": 30,
-				"h": 360
+				"h": 372
 			},
 			"scale": 0.25,
 			"frames": [
@@ -113,6 +113,27 @@
 						"w": 24,
 						"h": 70
 					}
+				},
+				{
+					"filename": "rewards-001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 10,
+						"h": 10
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 10,
+						"h": 10
+					},
+					"frame": {
+						"x": 1,
+						"y": 361,
+						"w": 10,
+						"h": 10
+					}
 				}
 			]
 		}
@@ -120,6 +141,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:27829e5707f2ae2d62b894ad3a07a8ff:115f452b1478d74d7329618282012fb2:4a9bf2ba9afc2827dfa178a3fc41fa73$"
+		"smartupdate": "$TexturePacker:SmartUpdate:d063137fc5b25a0e01446b77470aede9:c790d366bed7f661b868e6f0c2e57bf1:4a9bf2ba9afc2827dfa178a3fc41fa73$"
 	}
 }

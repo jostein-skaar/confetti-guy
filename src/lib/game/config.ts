@@ -29,7 +29,7 @@ export function createGameConfig(
 		physics: {
 			default: 'arcade',
 			arcade: {
-				gravity: { x: 0, y: 0 * pixelRatio },
+				gravity: { x: 0, y: 300 * pixelRatio },
 				debug: isDebug
 			}
 		},
