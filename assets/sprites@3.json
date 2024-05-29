@@ -4,11 +4,53 @@
 			"image": "sprites@3.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 392,
+				"w": 424,
 				"h": 212
 			},
 			"scale": 0.75,
 			"frames": [
+				{
+					"filename": "rewards-001.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 30,
+						"h": 30
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 30,
+						"h": 30
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 30,
+						"h": 30
+					}
+				},
+				{
+					"filename": "hero-005.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 84,
+						"h": 210
+					},
+					"spriteSourceSize": {
+						"x": 7,
+						"y": 0,
+						"w": 77,
+						"h": 207
+					},
+					"frame": {
+						"x": 33,
+						"y": 1,
+						"w": 77,
+						"h": 207
+					}
+				},
 				{
 					"filename": "hero-001.png",
 					"rotated": false,
@@ -24,9 +66,30 @@
 						"h": 210
 					},
 					"frame": {
-						"x": 1,
+						"x": 112,
 						"y": 1,
 						"w": 84,
+						"h": 210
+					}
+				},
+				{
+					"filename": "hero-002.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 84,
+						"h": 210
+					},
+					"spriteSourceSize": {
+						"x": 9,
+						"y": 0,
+						"w": 66,
+						"h": 210
+					},
+					"frame": {
+						"x": 198,
+						"y": 1,
+						"w": 66,
 						"h": 210
 					}
 				},
@@ -45,7 +108,7 @@
 						"h": 210
 					},
 					"frame": {
-						"x": 87,
+						"x": 266,
 						"y": 1,
 						"w": 84,
 						"h": 210
@@ -66,52 +129,10 @@
 						"h": 210
 					},
 					"frame": {
-						"x": 173,
+						"x": 352,
 						"y": 1,
 						"w": 71,
 						"h": 210
-					}
-				},
-				{
-					"filename": "hero-002.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 84,
-						"h": 210
-					},
-					"spriteSourceSize": {
-						"x": 9,
-						"y": 0,
-						"w": 66,
-						"h": 210
-					},
-					"frame": {
-						"x": 246,
-						"y": 1,
-						"w": 66,
-						"h": 210
-					}
-				},
-				{
-					"filename": "hero-005.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 84,
-						"h": 210
-					},
-					"spriteSourceSize": {
-						"x": 7,
-						"y": 0,
-						"w": 77,
-						"h": 207
-					},
-					"frame": {
-						"x": 314,
-						"y": 1,
-						"w": 77,
-						"h": 207
 					}
 				}
 			]
@@ -120,6 +141,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:27829e5707f2ae2d62b894ad3a07a8ff:115f452b1478d74d7329618282012fb2:4a9bf2ba9afc2827dfa178a3fc41fa73$"
+		"smartupdate": "$TexturePacker:SmartUpdate:d063137fc5b25a0e01446b77470aede9:c790d366bed7f661b868e6f0c2e57bf1:4a9bf2ba9afc2827dfa178a3fc41fa73$"
 	}
 }
