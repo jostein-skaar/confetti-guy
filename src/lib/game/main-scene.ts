@@ -1,5 +1,5 @@
 import { adjustForPixelRatio } from '@jostein-skaar/common-game';
-import Phaser, { GameObjects } from 'phaser';
+import Phaser, { type GameObjects } from 'phaser';
 
 export class MainScene extends Phaser.Scene {
 	width!: number;
@@ -19,12 +19,19 @@ export class MainScene extends Phaser.Scene {
 		confettiCount: 1000
 	};
 
+	control = {
+		up: false,
+		left: false,
+		right: false
+	};
+
 	startStopTimer = false;
 	hasStopped = false;
 	timeSinceStopped = 0;
 	score = 0;
 	timeStill = 0;
 	hasLost = false;
+	cursorButtonAlpha = 0.6;
 
 	constructor() {
 		super('main-scene');
@@ -55,14 +62,94 @@ export class MainScene extends Phaser.Scene {
 
 		this.cursors = this.input.keyboard!.createCursorKeys();
 
+		const upPositionX = this.width - adjustForPixelRatio(110);
+		const upPositionY = this.height - adjustForPixelRatio(120);
+		const leftRightPositionY = upPositionY + adjustForPixelRatio(54);
+		const leftPositionX = upPositionX - adjustForPixelRatio(27);
+		const rightPositionX = upPositionX + adjustForPixelRatio(27);
+		const buttonUp = this.add
+			.text(upPositionX, upPositionY, '⬆️', {
+				padding: { x: adjustForPixelRatio(5), y: adjustForPixelRatio(5) },
+				fontSize: adjustForPixelRatio(48) + 'px',
+				color: '#222'
+			})
+			.setDepth(1)
+			.setAlpha(this.cursorButtonAlpha)
+			.setInteractive()
+			.on('pointerdown', () => {
+				this.control.up = true;
+			})
+			.on('pointerout', () => {
+				this.control.up = false;
+			})
+			.on('pointerup', () => {
+				this.control.up = false;
+				this.performJump();
+			});
+		const buttonLeft = this.add
+			.text(leftPositionX, leftRightPositionY, '⬅️', {
+				padding: { x: adjustForPixelRatio(5), y: adjustForPixelRatio(5) },
+				fontSize: adjustForPixelRatio(48) + 'px',
+				color: '#222'
+			})
+			.setDepth(1)
+			.setAlpha(this.cursorButtonAlpha)
+			.setInteractive()
+			.on('pointerdown', () => {
+				this.control.left = true;
+			})
+			.on('pointerout', () => {
+				this.control.left = false;
+			})
+			.on('pointerup', () => {
+				this.control.left = false;
+			});
+		const buttonRight = this.add
+			.text(rightPositionX, leftRightPositionY, '➡️', {
+				padding: { x: adjustForPixelRatio(5), y: adjustForPixelRatio(5) },
+				fontSize: adjustForPixelRatio(48) + 'px',
+				color: '#222'
+			})
+			.setDepth(1)
+			.setAlpha(this.cursorButtonAlpha)
+			.setInteractive()
+			.on('pointerdown', () => {
+				this.control.right = true;
+			})
+			.on('pointerout', () => {
+				this.control.right = false;
+			})
+			.on('pointerup', () => {
+				this.control.right = false;
+			});
+
+		const hideCursorButtons = () => {
+			if (this.cursorButtonAlpha > 0) {
+				this.cursorButtonAlpha = 0;
+				buttonUp.setAlpha(this.cursorButtonAlpha);
+				buttonLeft.setAlpha(this.cursorButtonAlpha);
+				buttonRight.setAlpha(this.cursorButtonAlpha);
+			}
+		};
+
 		this.cursors.up.onDown = () => {
 			this.performJump();
+			hideCursorButtons();
 		};
-		this.input.on('pointerdown', () => {
-			if (this.input.activePointer.y < this.width / 2) {
-				this.performJump();
-			}
-		});
+		this.cursors.left.onDown = () => {
+			this.control.left = true;
+			hideCursorButtons();
+		};
+		this.cursors.left.onUp = () => {
+			this.control.left = false;
+		};
+		this.cursors.right.onDown = () => {
+			this.control.right = true;
+			hideCursorButtons();
+		};
+		this.cursors.right.onUp = () => {
+			this.control.right = false;
+		};
 
 		this.rewardGroup = this.physics.add.staticGroup();
 		this.platformGroup = this.physics.add.staticGroup();
@@ -114,43 +201,61 @@ export class MainScene extends Phaser.Scene {
 	}
 
 	update(_time: number, delta: number): void {
-		if (this.input.activePointer.isDown) {
-			const { x } = this.input.activePointer;
-			if (Math.abs(x - this.hero.x) < 10) {
-				this.hero.setVelocityX(0);
-				this.hero.anims.play('stand', true);
-				this.hero.setFlipX(false);
-				this.hasStopped = true;
-			} else if (x < this.hero.x) {
-				this.hero.setVelocityX(-this.settings.walkVelocity);
-				this.hero.anims.play('walk', true);
-				this.hero.setFlipX(true);
-				this.hasStopped = false;
-			} else if (x > this.hero.x) {
-				this.hero.setVelocityX(this.settings.walkVelocity);
-				this.hero.anims.play('walk', true);
-				this.hero.setFlipX(false);
-				this.hasStopped = false;
-			}
+		if (this.control.left) {
+			this.hero.setVelocityX(-this.settings.walkVelocity);
+			this.hero.anims.play('walk', true);
+			this.hero.setFlipX(true);
+			this.hasStopped = false;
+		} else if (this.control.right) {
+			this.hero.setVelocityX(this.settings.walkVelocity);
+			this.hero.anims.play('walk', true);
+			this.hero.setFlipX(false);
+			this.hasStopped = false;
 		} else {
-			if (this.cursors.left.isDown) {
-				this.hero.setVelocityX(-this.settings.walkVelocity);
-				this.hero.anims.play('walk', true);
-				this.hero.setFlipX(true);
-				this.hasStopped = false;
-			} else if (this.cursors.right.isDown) {
-				this.hero.setVelocityX(this.settings.walkVelocity);
-				this.hero.anims.play('walk', true);
-				this.hero.setFlipX(false);
-				this.hasStopped = false;
-			} else {
-				this.hero.setVelocityX(0);
-				this.hero.anims.play('stand', true);
-				this.hero.setFlipX(false);
-				this.timeSinceStopped += delta;
-				this.hasStopped = true;
-			}
+			this.hero.setVelocityX(0);
+			this.hero.anims.play('stand', true);
+			this.hero.setFlipX(false);
+			this.timeSinceStopped += delta;
+			this.hasStopped = true;
 		}
+
+		// if (this.input.activePointer.isDown) {
+		// const { x } = this.input.activePointer;
+		// if (Math.abs(x - this.hero.x) < 10) {
+		// 	this.hero.setVelocityX(0);
+		// 	this.hero.anims.play('stand', true);
+		// 	this.hero.setFlipX(false);
+		// 	this.hasStopped = true;
+		// } else if (x < this.hero.x) {
+		// 	this.hero.setVelocityX(-this.settings.walkVelocity);
+		// 	this.hero.anims.play('walk', true);
+		// 	this.hero.setFlipX(true);
+		// 	this.hasStopped = false;
+		// } else if (x > this.hero.x) {
+		// 	this.hero.setVelocityX(this.settings.walkVelocity);
+		// 	this.hero.anims.play('walk', true);
+		// 	this.hero.setFlipX(false);
+		// 	this.hasStopped = false;
+		// }
+		// } else {
+		// 	if (this.cursors.left.isDown) {
+		// 		this.hero.setVelocityX(-this.settings.walkVelocity);
+		// 		this.hero.anims.play('walk', true);
+		// 		this.hero.setFlipX(true);
+		// 		this.hasStopped = false;
+		// 	} else if (this.cursors.right.isDown) {
+		// 		this.hero.setVelocityX(this.settings.walkVelocity);
+		// 		this.hero.anims.play('walk', true);
+		// 		this.hero.setFlipX(false);
+		// 		this.hasStopped = false;
+		// 	} else {
+		// 		this.hero.setVelocityX(0);
+		// 		this.hero.anims.play('stand', true);
+		// 		this.hero.setFlipX(false);
+		// 		this.timeSinceStopped += delta;
+		// 		this.hasStopped = true;
+		// 	}
+		// }
 
 		if (this.hasStopped === false) {
 			this.startStopTimer = true;
