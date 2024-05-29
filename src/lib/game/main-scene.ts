@@ -10,6 +10,8 @@ export class MainScene extends Phaser.Scene {
 	platformGroup!: Phaser.Physics.Arcade.StaticGroup;
 	scoreText!: GameObjects.Text;
 	levelClearedText!: GameObjects.Text;
+	losingText!: GameObjects.Text;
+	allowSlacking = false;
 
 	settings = {
 		groundHeight: adjustForPixelRatio(24),
@@ -19,7 +21,8 @@ export class MainScene extends Phaser.Scene {
 		platformColor: 0xfecc00,
 		confettiBurstCount: 100,
 		confettiCount: 10,
-		restartTime: 50000
+		restartTime: 7000,
+		warningTime: 2000
 	};
 
 	control = {
@@ -158,8 +161,13 @@ export class MainScene extends Phaser.Scene {
 
 		this.cursors.up.onDown = () => {
 			this.performJump();
+			this.control.up = true;
 			hideCursorButtons();
 		};
+		this.cursors.up.onUp = () => {
+			this.control.up = false;
+		};
+
 		this.cursors.left.onDown = () => {
 			this.control.left = true;
 			hideCursorButtons();
@@ -246,6 +254,27 @@ export class MainScene extends Phaser.Scene {
 			yoyo: true,
 			repeat: -1
 		});
+
+		this.losingText = this.add
+			.text(this.width / 2, this.height / 2, 'HEY!\nNo slacking off!', {
+				fontSize: `${adjustForPixelRatio(40)}px`,
+				color: '#006aa7',
+				fontStyle: 'bold',
+				align: 'center'
+			})
+			.setOrigin(0.5, 0.5)
+			.setDepth(1)
+			.setVisible(false);
+
+		this.tweens.add({
+			targets: this.losingText,
+			// x: this.bredde,
+			scale: 0.9,
+			ease: 'Elastic',
+			duration: 250,
+			yoyo: true,
+			repeat: -1
+		});
 	}
 
 	update(_time: number, delta: number): void {
@@ -259,6 +288,8 @@ export class MainScene extends Phaser.Scene {
 			this.hero.anims.play('walk', true);
 			this.hero.setFlipX(false);
 			this.hasStopped = false;
+		} else if (this.control.up) {
+			this.hasStopped = false;
 		} else {
 			this.hero.setVelocityX(0);
 			this.hero.anims.play('stand', true);
@@ -271,17 +302,24 @@ export class MainScene extends Phaser.Scene {
 			this.startStopTimer = true;
 		}
 
+		if (this.allowSlacking) {
+			this.timeSinceStopped = 0;
+		}
+
 		if (this.startStopTimer && this.hasStopped) {
 			this.timeSinceStopped += delta;
 		} else {
 			this.timeSinceStopped = 0;
 		}
 
+		if (this.timeSinceStopped > this.settings.warningTime) {
+			this.losingText.setVisible(true);
+		} else {
+			this.losingText.setVisible(false);
+		}
+
 		if (this.timeSinceStopped > this.settings.restartTime) {
-			this.addPlatforms();
-			this.addConfetti();
-			this.timeSinceStopped = 0;
-			this.startStopTimer = false;
+			this.lose();
 		}
 
 		if (this.isHeroBelowGround()) {
@@ -323,6 +361,7 @@ export class MainScene extends Phaser.Scene {
 	private performJump() {
 		if (this.hero.body.onFloor()) {
 			this.hero.setVelocityY(-this.settings.jumpVelocity);
+			this.hasStopped = false;
 		}
 	}
 
@@ -514,6 +553,7 @@ export class MainScene extends Phaser.Scene {
 	}
 
 	private finished() {
+		this.allowSlacking = true;
 		this.level++;
 		this.rank = this.ranks[this.level > 11 ? 11 : this.level];
 		if (this.level > 10) {
@@ -533,6 +573,7 @@ export class MainScene extends Phaser.Scene {
 			this.addConfetti();
 			setTimeout(() => {
 				this.levelClearedText.setVisible(false);
+				this.allowSlacking = false;
 			}, 1000);
 		}, 2500);
 	}
@@ -544,10 +585,11 @@ export class MainScene extends Phaser.Scene {
 		this.hasLost = true;
 		this.scene.pause();
 		this.cameras.main.setBackgroundColor(0xbababa);
-		this.cameras.main.setAlpha(0.5);
-		// setTimeout(() => {
-		// 	window.location.href = '/lose?score=' + this.score.toFixed(2);
-		// }, 1200);
+		// this.cameras.main.setAlpha(0.5);
+		this.losingText.setText('Too much\nSlacking!').setVisible(true);
+		setTimeout(() => {
+			window.location.href = '/lose?rank=' + this.rank;
+		}, 1200);
 	}
 	private getDanRank(danLevel: number): string {
 		const suffixes = ['th', 'st', 'nd', 'rd'];
