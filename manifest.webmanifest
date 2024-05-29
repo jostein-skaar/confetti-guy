@@ -1,8 +1,8 @@
 {
   "name": "Confetti Guy",
   "short_name": "Confetti Guy",
-  "theme_color": "#fecc00",
-  "background_color": "#006aa7",
+  "theme_color": "#006aa7",
+  "background_color": "#424242",
   "display": "fullscreen",
   "scope": "./",
   "start_url": "./",
