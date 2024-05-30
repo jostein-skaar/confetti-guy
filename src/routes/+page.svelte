@@ -3,6 +3,8 @@
 	import confettiGuyImage from '$lib/images/confetti-guy.png';
 	import { onMount } from 'svelte';
 
+	let rank = localStorage.getItem('confettiguy-rank') || 'Confetti Trainee';
+
 	let visible = false;
 	onMount(() => {
 		visible = true;
@@ -21,6 +23,14 @@
 			src={confettiGuyImage}
 			alt="Drawing of Confetti Guy"
 		/>
-		<a transition:fly={{ y: 100, duration: 2000 }} href="/game">Start Game</a>
+		<p class="rank">Current Rank: <span>{rank}</span></p>
+
+		<a transition:fly={{ y: 100, duration: 2000 }} href="/game">Begin Work</a>
 	</header>
 {/if}
+
+<style>
+	.rank span {
+		font-size: 1.5rem;
+	}
+</style>

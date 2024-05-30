@@ -22,7 +22,9 @@ export class MainScene extends Phaser.Scene {
 		confettiBurstCount: 100,
 		confettiCount: 10,
 		restartTime: 7000,
-		warningTime: 2000
+		warningTime: 2000,
+		storageKeyLevel: "confettiguy-level",
+		storageKeyRank: "confettiguy-rank"
 	};
 
 	control = {
@@ -45,20 +47,20 @@ export class MainScene extends Phaser.Scene {
 
 	ranks = [
 		'Confetti Trainee',
+		'Confetti Novice',
+		'Confetti Apprentice',
 		'Confetti Sweeper',
-		'Party Cleaner',
-		'Confetti Collector',
-		'Celebration Custodian',
-		'Festivity Janitor',
-		'Event Sweeper',
-		'Party Polisher',
-		'Confetti Commander',
-		'Celebration Specialist',
+		'Confetti Supervisor',
+		'Confetti Coordinator',
+		'Confetti Specialist',
+		'Confetti Captain',
+		'Confetti Expert',
+		'Confetti Master',
 		'Confetti Conqueror',
 		'Confetti Guy'
 	];
-	level = 0;
-	rank = this.ranks[0];
+	level = parseInt(localStorage.getItem(this.settings.storageKeyLevel) ?? '0', 10);
+	rank = this.ranks[this.level];
 
 	constructor() {
 		super('main-scene');
@@ -559,6 +561,8 @@ export class MainScene extends Phaser.Scene {
 		if (this.level > 10) {
 			this.rank += ' ' + this.getDanRank(this.level - 10);
 		}
+		localStorage.setItem(this.settings.storageKeyLevel, this.level.toString());
+		localStorage.setItem(this.settings.storageKeyRank, this.rank);
 		this.levelClearedText.setText(
 			`Level ${this.level} cleared!\n${this.replaceFirstTwoOccurrences(this.rank, ' ', '\n')}`
 		);
