@@ -92,14 +92,15 @@ export class MainScene extends Phaser.Scene {
 		this.cursors = this.input.keyboard!.createCursorKeys();
 
 		const upPositionX = this.width - adjustForPixelRatio(100);
-		const upPositionY = this.height - adjustForPixelRatio(135);
-		const leftRightPositionY = upPositionY + adjustForPixelRatio(54);
-		const leftPositionX = upPositionX - adjustForPixelRatio(27);
-		const rightPositionX = upPositionX + adjustForPixelRatio(27);
+		const upPositionY = this.height - adjustForPixelRatio(158);
+		const leftRightPositionY = upPositionY + adjustForPixelRatio(56);
+		const leftPositionX = upPositionX - adjustForPixelRatio(29);
+		const rightPositionX = upPositionX + adjustForPixelRatio(29);
+		const fontSizeCursorButtons = adjustForPixelRatio(54) + 'px';
 		const buttonUp = this.add
 			.text(upPositionX, upPositionY, '⬆️', {
 				padding: { x: adjustForPixelRatio(5), y: adjustForPixelRatio(5) },
-				fontSize: adjustForPixelRatio(48) + 'px',
+				fontSize: fontSizeCursorButtons,
 				color: '#222'
 			})
 			.setDepth(1)
@@ -113,12 +114,12 @@ export class MainScene extends Phaser.Scene {
 			})
 			.on('pointerup', () => {
 				this.control.up = false;
-				this.performJump();
+				this.performJump(true);
 			});
 		const buttonLeft = this.add
 			.text(leftPositionX, leftRightPositionY, '⬅️', {
 				padding: { x: adjustForPixelRatio(5), y: adjustForPixelRatio(5) },
-				fontSize: adjustForPixelRatio(48) + 'px',
+				fontSize: fontSizeCursorButtons,
 				color: '#222'
 			})
 			.setDepth(1)
@@ -136,7 +137,7 @@ export class MainScene extends Phaser.Scene {
 		const buttonRight = this.add
 			.text(rightPositionX, leftRightPositionY, '➡️', {
 				padding: { x: adjustForPixelRatio(5), y: adjustForPixelRatio(5) },
-				fontSize: adjustForPixelRatio(48) + 'px',
+				fontSize: fontSizeCursorButtons,
 				color: '#222'
 			})
 			.setDepth(1)
@@ -162,7 +163,7 @@ export class MainScene extends Phaser.Scene {
 		};
 
 		this.cursors.up.onDown = () => {
-			this.performJump();
+			this.performJump(false);
 			this.control.up = true;
 			hideCursorButtons();
 		};
@@ -360,8 +361,8 @@ export class MainScene extends Phaser.Scene {
 		}
 	}
 
-	private performJump() {
-		if (this.hero.body.onFloor()) {
+	private performJump(isButton:boolean) {
+		if (isButton || this.hero.body.onFloor()) {
 			this.hero.setVelocityY(-this.settings.jumpVelocity);
 			this.hasStopped = false;
 		}
